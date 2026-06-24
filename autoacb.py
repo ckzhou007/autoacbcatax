@@ -40,7 +40,13 @@ OUTPUT: a new .xlsx workbook = your input workbook + new sheets:
                             of a foreign company is still reportable). Edit the
                             "T1135 Reportable?" column directly in this sheet — the
                             monthly totals are live SUMIFS formulas that update
-                            automatically when you change Yes/No.
+                            automatically when you change Yes/No. A holding with no
+                            recent transactions still carries its ACB forward through
+                            the current month (run date) rather than stopping at the
+                            last transaction — so the current year's tab stays current
+                            even during a quiet month, and a position with no activity
+                            at all this year still gets a tab. Future months are left
+                            blank rather than assumed unchanged.
   - "Summary"             : full chronological ACB ledger, ticker by ticker — every
                             transaction, running ACB, running share balance, and
                             superficial-loss detail, reviewable line by line.
@@ -840,7 +846,15 @@ def _write_t1135_sheets(wb, all_ledgers):
 
     all_dates = [s[0] for _, snaps, _, _ in tickers_info for s in snaps]
     start_ym = (min(all_dates).year, min(all_dates).month)
-    end_ym = (max(all_dates).year, max(all_dates).month)
+    # A holding carries forward unchanged once transactions stop, so the range
+    # must reach at least today's month — not just the month of the last
+    # recorded transaction — or a quiet ticker would silently drop out of the
+    # current (still-in-progress) year's monthly columns, and an entire year
+    # with zero activity but a still-held position would be skipped outright.
+    # We never project past today: future months are genuinely unknown, not
+    # "assumed unchanged," so they're left out rather than guessed at.
+    today = date.today()
+    end_ym = max((max(all_dates).year, max(all_dates).month), (today.year, today.month))
     months = _month_range(start_ym, end_ym)
     series = {ticker: _monthly_peak_series(snaps, months) for ticker, snaps, _, _ in tickers_info}
 
