@@ -166,3 +166,18 @@ Released under the [MIT License](LICENSE).
 ## ⚠️ Disclaimer
 
 *autoacb is an open-source automation tool written for personal portfolio organization. It does not constitute certified accounting software, nor does it provide legal or tax advice. The user assumes sole responsibility for verifying the output against their official brokerage statements before submitting figures to the Canada Revenue Agency.*
+
+## 📦 Supported Asset Classes
+
+**autoacb** natively tracks average cost base pooling and handles compliance reporting for standard capital property:
+
+* **Publicly Traded Stocks** (Common and preferred shares across CAD, USD, and international markets).
+* **Exchange-Traded Funds (ETFs)** & **Real Estate Investment Trusts (REITs)**.
+* **Mutual Funds**.
+* **Cryptocurrency** (When entered as standard fiat transactions, e.g., trading BTC for CAD or USD).
+
+### 🛑 Out of Scope / Unsupported Transactions
+To keep the script local, lightweight, and legally compliant, the following advanced trade structures are **not** supported and will cause processing errors:
+* **Options Contracts**: Due to premium-shifting rules upon execution or assignment.
+* **Short Selling**: Short positions use separate tax rules where coverage loops are typically treated as 100% taxable business income by the CRA, rather than capital gains.
+* **Multi-Currency Barter Trades**: Direct crypto-to-crypto pairings (e.g., buying ETH using BTC) must be split into separate fiat-denominated ledger lines before importing.
